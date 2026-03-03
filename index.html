@@ -2695,7 +2695,7 @@
             });
 
             // ── Project filter tabs ──
-            document.querySelectorAll('.pf-btn').forEach(btn => {
+            document.querySelectorAll('.pf-btn[data-pf]').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
@@ -2795,7 +2795,11 @@
             let vp = Promise.resolve();
             if (!lastPlayed || (now - parseInt(lastPlayed) > 30000)) {
                 localStorage.setItem('portfolio_voice_played', now.toString());
-                vp = speak("Welcome. You are about to step into the portfolio of Abhishek Dhiman — a Full Stack Developer and AI Engineer who builds intelligent systems and ships products that actually matter. Let's go.");
+                // Added a safety timeout (2s) to prevent hanging if speech synthesis fails to fire onend
+                vp = Promise.race([
+                    speak("Welcome. You are about to step into the portfolio of Abhishek Dhiman — a Full Stack Developer and AI Engineer who builds intelligent systems and ships products that actually matter. Let's go."),
+                    new Promise(r => setTimeout(r, 2000))
+                ]);
             }
             prog(45);
 
@@ -2843,8 +2847,9 @@
             setTimeout(() => $i('hdesc').classList.add('on'), 1100);
             setTimeout(() => $i('hctas').classList.add('on'), 1300);
             setTimeout(() => $i('shint').classList.add('on'), 1900);
+            initReveal(); // Trigger reveal immediately for current viewport
             setTimeout(startTyped, 1000);
-            setTimeout(initReveal, 500);
+            setTimeout(initReveal, 150); // Re-run shortly after to catch elements that might have moved
             initContactForm();
         }
 
@@ -2928,8 +2933,13 @@
         function initReveal() {
             const obs = new IntersectionObserver(entries => {
                 entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('on'); });
-            }, { threshold: 0.08 });
-            document.querySelectorAll('.rv').forEach(r => obs.observe(r));
+            }, { threshold: 0.02 }); // Lower threshold for more reliable trigger
+            document.querySelectorAll('.rv').forEach(r => {
+                obs.observe(r);
+                // Immediate check for elements already in view
+                const rect = r.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) r.classList.add('on');
+            });
         }
 
         /* ═══════════════════════════════
