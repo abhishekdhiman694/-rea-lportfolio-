@@ -2021,13 +2021,61 @@
                 display: none;
             }
 
+            section {
+                padding-top: 5rem !important;
+                padding-bottom: 5rem !important;
+            }
+
             #hero,
             #about,
             #skills,
             #projects,
-            #contact {
-                padding-left: 1.5rem;
-                padding-right: 1.5rem;
+            #contact,
+            #freelance {
+                padding-left: 1.5rem !important;
+                padding-right: 1.5rem !important;
+            }
+
+            #hero {
+                min-height: auto;
+                padding-bottom: 8rem !important;
+            }
+
+            /* Responsive Typography */
+            .s2-name {
+                font-size: clamp(2.5rem, 12vw, 6rem) !important;
+                gap: 0.02em !important;
+            }
+
+            .s2-sub {
+                font-size: clamp(0.9rem, 4vw, 1.4rem) !important;
+                padding: 0 1rem;
+            }
+
+            h1.hname {
+                font-size: clamp(2.4rem, 11vw, 5rem);
+                overflow-wrap: break-word;
+                line-height: 1.1;
+                margin-bottom: 1rem;
+            }
+
+            h2.stitle {
+                font-size: clamp(1.8rem, 8vw, 2.5rem);
+            }
+
+            .hero-role {
+                font-size: 1.2rem;
+                margin-bottom: 2rem;
+            }
+
+            .c-big {
+                font-size: clamp(1.8rem, 9vw, 2.6rem) !important;
+                margin-bottom: 1rem;
+            }
+
+            .about-num {
+                font-size: 6rem;
+                margin-bottom: -1rem;
             }
 
             #about {
@@ -2035,10 +2083,21 @@
                 gap: 3rem;
             }
 
+            .c-left {
+                position: relative;
+                top: 0;
+                margin-bottom: 2rem;
+            }
+
+            .c-right {
+                padding: 1.5rem;
+            }
+
             footer {
                 flex-direction: column;
                 gap: 0.5rem;
                 text-align: center;
+                padding: 2rem 1.5rem;
             }
 
             .proj-grid {
@@ -2051,11 +2110,12 @@
 
             .pf-name {
                 max-width: 100%;
-                font-size: 1.6rem;
+                font-size: 1.4rem;
             }
 
             .pf-desc {
                 max-width: 100%;
+                font-size: 0.8rem;
             }
 
             .pf-num {
@@ -2063,11 +2123,21 @@
             }
 
             .skills-arena {
-                min-height: 360px;
+                min-height: 280px;
             }
 
             .orbit-ring.r3 {
                 display: none;
+            }
+
+            .orbit-ring.r2 {
+                width: 280px;
+                height: 280px;
+            }
+
+            .orbit-ring.r1 {
+                width: 180px;
+                height: 180px;
             }
         }
     </style>
