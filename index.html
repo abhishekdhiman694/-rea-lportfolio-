@@ -4,12 +4,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Abhishek Dhiman • Full Stack Developer</title>
+    <title>Abhishek Dhiman • Full Stack Developer & AI Engineer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
         rel="stylesheet" />
+    <!-- Three.js and GSAP for Interactive 3D Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <style>
         *,
         *::before,
@@ -20,24 +23,26 @@
         }
 
         :root {
-            /* BROWNISH/BEIGE PALETTE — warm earth tones */
-            --bg: #fcfaf8;
-            --bg2: #f4f0ec;
-            --bg3: #ece4db;
-            --surface: #ffffff;
-            --border: rgba(45, 36, 30, 0.1);
-            --border2: rgba(45, 36, 30, 0.06);
-            --text: #2d241e;
-            --text2: #4a3d34;
-            --muted: #8b7d74;
-            --accent: #8b5e3c;
-            --accent2: #a68a64;
-            --accent3: #c2a878;
-            --green: #4b7d52;
-            --purple: #8a6d9e;
-            --font-head: 'Syne', sans-serif;
+            /* PREMIUM DARK NEON & GLASSMORPHISM PALETTE */
+            --bg: #07080d;
+            --bg2: #0f111a;
+            --bg3: #181b28;
+            --surface: rgba(15, 17, 26, 0.7);
+            --border: rgba(255, 255, 255, 0.08);
+            --border2: rgba(255, 255, 255, 0.04);
+            --text: #f3f4f6;
+            --text2: #9ca3af;
+            --muted: #6b7280;
+            --accent: #6366f1; /* Cosmic Indigo */
+            --accent2: #06b6d4; /* Neon Cyan */
+            --accent3: #a855f7; /* Neon Purple */
+            --green: #10b981; /* Emerald Green */
+            --purple: #8b5cf6;
+            --font-head: 'Outfit', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
             --font-serif: 'Playfair Display', serif;
+            --glass: rgba(15, 17, 26, 0.75);
+            --glow: 0 0 20px rgba(99, 102, 241, 0.25);
         }
 
         html {
@@ -57,7 +62,7 @@
             content: '';
             position: fixed;
             inset: 0;
-            background-image: radial-gradient(rgba(139, 94, 60, 0.08) 1px, transparent 1px);
+            background-image: radial-gradient(rgba(99, 102, 241, 0.08) 1px, transparent 1px);
             background-size: 28px 28px;
             pointer-events: none;
             z-index: 0;
@@ -65,36 +70,39 @@
 
         /* ══════════════════════════════════
    CURSOR
-══════════════════════════════════ */
+   ══════════════════════════════════ */
         #cur {
             position: fixed;
-            width: 10px;
-            height: 10px;
-            background: var(--accent);
+            width: 8px;
+            height: 8px;
+            background: var(--accent2);
             border-radius: 50%;
             pointer-events: none;
             z-index: 9999;
             transform: translate(-50%, -50%);
-            transition: transform 0.15s ease, background 0.2s;
+            transition: transform 0.1s ease, background 0.2s;
+            box-shadow: 0 0 10px var(--accent2);
         }
 
         #rng {
             position: fixed;
-            width: 34px;
-            height: 34px;
-            border: 1.5px solid rgba(88, 166, 255, 0.5);
+            width: 32px;
+            height: 32px;
+            border: 1px solid rgba(99, 102, 241, 0.45);
             border-radius: 50%;
             pointer-events: none;
             z-index: 9998;
             transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s, opacity 0.3s;
+            transition: width 0.25s, height 0.25s, opacity 0.25s, border-color 0.25s, background 0.25s;
         }
 
         #rng.big {
-            width: 54px;
-            height: 54px;
-            opacity: 0.3;
-            border-color: var(--accent3);
+            width: 50px;
+            height: 50px;
+            opacity: 0.6;
+            border-color: var(--accent2);
+            background: rgba(6, 182, 212, 0.05);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
         }
 
         /* ══════════════════════════════════
@@ -181,9 +189,10 @@
             left: 0;
             right: 0;
             height: 90px;
-            background: #2d241e;
+            background: var(--bg2);
             z-index: 6;
             transition: height 1.4s cubic-bezier(0.76, 0, 0.24, 1);
+            border-bottom: 1px solid var(--border);
         }
 
         .bar-top {
@@ -192,14 +201,18 @@
 
         .bar-bottom {
             bottom: 0;
+            border-bottom: none;
+            border-top: 1px solid var(--border);
         }
 
         .bars-open .bar-top {
             height: 0;
+            border-bottom-width: 0;
         }
 
         .bars-open .bar-bottom {
             height: 0;
+            border-top-width: 0;
         }
 
         .prog-wrap {
@@ -220,15 +233,15 @@
         .prog-fill {
             height: 100%;
             width: 0%;
-            background: var(--accent);
-            box-shadow: 0 0 12px var(--accent);
+            background: var(--accent2);
+            box-shadow: 0 0 12px var(--accent2);
             transition: width 0.12s linear;
         }
 
         .prog-label {
             font-family: var(--font-mono);
             font-size: 0.6rem;
-            color: rgba(88, 166, 255, 0.5);
+            color: var(--accent2);
             letter-spacing: 0.15em;
             margin-top: 0.5rem;
             text-align: center;
@@ -255,7 +268,7 @@
         .boot-lines {
             font-family: var(--font-mono);
             font-size: clamp(0.68rem, 1.4vw, 0.92rem);
-            color: rgba(88, 166, 255, 0.55);
+            color: var(--text2);
             letter-spacing: 0.12em;
             display: flex;
             flex-direction: column;
@@ -290,7 +303,7 @@
         .s2-eye {
             font-family: var(--font-mono);
             font-size: clamp(0.65rem, 1.2vw, 0.85rem);
-            color: rgba(88, 166, 255, 0.6);
+            color: var(--accent2);
             letter-spacing: 0.3em;
             opacity: 0;
             transform: translateY(12px);
@@ -387,8 +400,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(252, 250, 248, 0.92);
-            border-bottom: 1px solid var(--border2);
+            background: var(--glass);
+            border-bottom: 1px solid var(--border);
             backdrop-filter: blur(24px);
             transform: translateY(-110%);
             transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
@@ -1496,13 +1509,13 @@
             padding: 0.6rem 1.4rem;
             border-radius: 8px;
             transition: all 0.25s;
-            background: rgba(88, 166, 255, 0.04);
+            background: rgba(99, 102, 241, 0.05);
             white-space: nowrap;
         }
 
         .pf-link:hover {
             background: var(--pf-color, var(--accent));
-            color: #0d1117;
+            color: var(--bg);
         }
 
         .pf-arrow {
@@ -1904,8 +1917,8 @@
         .form-input:focus,
         .form-textarea:focus {
             outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 4px rgba(139, 94, 60, 0.1);
+            border-color: var(--accent2);
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.15);
             background: var(--bg);
         }
 
@@ -1915,8 +1928,8 @@
         }
 
         .submit-btn {
-            background: var(--text);
-            color: var(--bg);
+            background: var(--accent);
+            color: #ffffff;
             border: none;
             padding: 1.2rem;
             border-radius: 10px;
@@ -1929,12 +1942,13 @@
             align-items: center;
             justify-content: center;
             gap: 0.8rem;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
         }
 
         .submit-btn:hover {
-            background: var(--accent);
+            background: var(--accent2);
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(139, 94, 60, 0.3);
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.35);
         }
 
         .submit-btn:disabled {
@@ -2201,6 +2215,7 @@
 
         <!-- HERO -->
         <section id="hero">
+            <canvas id="three-hero-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.85;"></canvas>
             <div class="blob blob1"></div>
             <div class="blob blob2"></div>
             <div class="hero-eyebrow" id="heye">Available for Opportunities</div>
@@ -2290,25 +2305,21 @@
                     </div>
                     <!-- View toggle -->
                     <div class="orbit-toggle" id="viewToggle">
-                        <button class="view-btn" data-view="orbit">🪐 Orbit</button>
-                        <button class="view-btn active" data-view="grid">⊞ Grid</button>
+                        <button class="view-btn active" data-view="orbit">🪐 Orbit</button>
+                        <button class="view-btn" data-view="grid">⊞ Grid</button>
                         <button class="view-btn" data-view="list">≡ List</button>
                     </div>
                 </div>
             </div>
 
             <!-- ORBIT VIEW -->
-            <div class="skills-arena" id="orbitView">
-                <!-- Rings -->
-                <div class="orbit-ring r1"></div>
-                <div class="orbit-ring r2"></div>
-                <div class="orbit-ring r3"></div>
+            <div class="skills-arena" id="orbitView" style="position: relative; width: 100%; min-height: 500px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <canvas id="three-skills-canvas" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; cursor: grab;"></canvas>
                 <!-- Hub -->
-                <div class="skills-hub">
+                <div class="skills-hub" style="position: relative; z-index: 2; pointer-events: none;">
                     <div class="hub-label">SKILLS</div>
                     <div class="hub-count" id="hubCount">20</div>
                 </div>
-                <!-- Orbs injected by JS -->
             </div>
 
             <!-- GRID VIEW -->
@@ -2646,10 +2657,11 @@
         ];
 
         /* ═══════════════════════════════
-           ORBIT SYSTEM
+           ORBIT SYSTEM (Three.js 3D Constellation)
         ═══════════════════════════════ */
         let currentCat = 'all';
-        let currentView = 'grid';
+        let currentView = 'orbit';
+        let skillsThree = null;
 
         function getFilteredSkills(cat) {
             return cat === 'all' ? SKILLS : SKILLS.filter(s => s.cat === cat);
@@ -2657,52 +2669,220 @@
 
         function buildOrbit(skills) {
             const arena = document.getElementById('orbitView');
-            // remove old orbs
-            arena.querySelectorAll('.s-orb').forEach(o => o.remove());
+            const canvas = document.getElementById('three-skills-canvas');
+            if (!canvas) return;
 
-            const rings = [
-                { el: arena.querySelector('.r1'), speed: 28, dir: 1, r: 110, slots: 4 },
-                { el: arena.querySelector('.r2'), speed: 40, dir: -1, r: 170, slots: 7 },
-                { el: arena.querySelector('.r3'), speed: 55, dir: 1, r: 230, slots: 10 },
-            ];
+            // Remove previous labels
+            arena.querySelectorAll('.three-label').forEach(el => el.remove());
 
-            let si = 0;
-            rings.forEach((ring, ri) => {
-                if (!ring.el) return;
-                const count = Math.min(ring.slots, skills.length - si);
-                if (count <= 0) return;
-                const ringSkills = skills.slice(si, si + count);
-                si += count;
+            // If there's an existing animation frame active, cancel it
+            if (skillsThree) {
+                cancelAnimationFrame(skillsThree.animId);
+                if (skillsThree.renderer) {
+                    skillsThree.renderer.dispose();
+                }
+            }
 
-                ringSkills.forEach((sk, i) => {
-                    const angleDeg = (360 / count) * i - 90;
-                    const angleRad = angleDeg * Math.PI / 180;
-                    const x = Math.cos(angleRad) * ring.r;
-                    const y = Math.sin(angleRad) * ring.r;
+            const scene = new THREE.Scene();
+            const width = arena.clientWidth || 500;
+            const height = arena.clientHeight || 500;
+            const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 1000);
+            camera.position.z = 15;
 
-                    const orb = document.createElement('div');
-                    orb.className = 's-orb';
-                    orb.style.cssText = `
-        left: calc(50% + ${x}px);
-        top: calc(50% + ${y}px);
-        --speed: ${ring.speed}s;
-        --cdir: ${ring.dir > 0 ? 'reverse' : 'normal'};
-        --orb-color: ${sk.color};
-        animation: counterSpin ${ring.speed}s linear infinite ${ring.dir > 0 ? 'reverse' : 'normal'};
-      `;
-                    orb.innerHTML = `
-        <div class="s-orb-inner">${sk.icon}</div>
-        <div class="s-orb-label">${sk.name}</div>
-      `;
-                    orb.title = `${sk.name} — ${sk.desc}`;
-                    arena.appendChild(orb);
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Create nodes
+            const group = new THREE.Group();
+            scene.add(group);
+
+            const nodes = [];
+            const labels = [];
+
+            // Layout nodes on a sphere
+            const count = skills.length;
+            for (let i = 0; i < count; i++) {
+                const sk = skills[i];
+                const phi = Math.acos(-1 + (2 * i) / count);
+                const theta = Math.sqrt(count * Math.PI) * phi;
+
+                const r = 4.8; // sphere radius
+                const x = r * Math.sin(phi) * Math.cos(theta);
+                const y = r * Math.sin(phi) * Math.sin(theta);
+                const z = r * Math.cos(phi);
+
+                // Create mesh node
+                const geom = new THREE.SphereGeometry(0.16, 16, 16);
+                const mat = new THREE.MeshBasicMaterial({ color: sk.color });
+                const mesh = new THREE.Mesh(geom, mat);
+                mesh.position.set(x, y, z);
+                group.add(mesh);
+
+                // Create HTML label overlay
+                const label = document.createElement('div');
+                label.className = 'three-label';
+                label.style.cssText = `
+                    position: absolute;
+                    z-index: 2;
+                    transform: translate(-50%, -50%);
+                    font-family: var(--font-mono);
+                    font-size: 0.62rem;
+                    color: var(--text2);
+                    background: rgba(15, 17, 26, 0.85);
+                    border: 1px solid ${sk.color}40;
+                    padding: 0.35rem 0.7rem;
+                    border-radius: 4px;
+                    pointer-events: auto;
+                    white-space: nowrap;
+                    transition: border-color 0.2s, color 0.2s, background 0.2s;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.3rem;
+                `;
+                label.innerHTML = `<span>${sk.icon}</span> <span>${sk.name}</span>`;
+                label.title = `${sk.name} — ${sk.desc}`;
+                
+                // Add hover effect
+                label.addEventListener('mouseenter', () => {
+                    label.style.borderColor = sk.color;
+                    label.style.color = '#fff';
+                    label.style.background = sk.color + '20';
+                    mesh.scale.set(1.5, 1.5, 1.5);
+                });
+                label.addEventListener('mouseleave', () => {
+                    label.style.borderColor = sk.color + '40';
+                    label.style.color = 'var(--text2)';
+                    label.style.background = 'rgba(15, 17, 26, 0.85)';
+                    mesh.scale.set(1, 1, 1);
                 });
 
-                // sync ring animation direction
-                ring.el.style.animationDirection = ring.dir > 0 ? 'normal' : 'reverse';
-                ring.el.style.animationDuration = ring.speed + 's';
+                arena.appendChild(label);
+
+                nodes.push({ mesh, x, y, z, color: sk.color });
+                labels.push({ element: label, mesh });
+            }
+
+            // Draw connecting lines between nearest neighbors
+            const lineMat = new THREE.LineBasicMaterial({
+                color: 0x6366f1,
+                transparent: true,
+                opacity: 0.15
             });
 
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dist = nodes[i].mesh.position.distanceTo(nodes[j].mesh.position);
+                    if (dist < 4.2) {
+                        const lineGeom = new THREE.BufferGeometry().setFromPoints([
+                            nodes[i].mesh.position,
+                            nodes[j].mesh.position
+                        ]);
+                        const line = new THREE.Line(lineGeom, lineMat);
+                        group.add(line);
+                    }
+                }
+            }
+
+            // Interaction
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+            
+            canvas.addEventListener('mousedown', () => { isDragging = true; canvas.style.cursor = 'grabbing'; });
+            window.addEventListener('mouseup', () => { isDragging = false; canvas.style.cursor = 'grab'; });
+            canvas.addEventListener('mousemove', (e) => {
+                const deltaMove = {
+                    x: e.offsetX - previousMousePosition.x,
+                    y: e.offsetY - previousMousePosition.y
+                };
+
+                if (isDragging) {
+                    group.rotation.y += deltaMove.x * 0.005;
+                    group.rotation.x += deltaMove.y * 0.005;
+                }
+
+                previousMousePosition = {
+                    x: e.offsetX,
+                    y: e.offsetY
+                };
+            });
+
+            // Touch events for mobile
+            canvas.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                previousMousePosition = { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+            });
+            window.addEventListener('touchend', () => { isDragging = false; });
+            canvas.addEventListener('touchmove', (e) => {
+                if (!isDragging) return;
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                const currentTouchPos = { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+                const deltaMove = {
+                    x: currentTouchPos.x - previousMousePosition.x,
+                    y: currentTouchPos.y - previousMousePosition.y
+                };
+                group.rotation.y += deltaMove.x * 0.008;
+                group.rotation.x += deltaMove.y * 0.008;
+                previousMousePosition = currentTouchPos;
+            });
+
+            // Update projection mapping in loop
+            const tempV = new THREE.Vector3();
+            let animId = 0;
+            let skillsVisible = true;
+
+            if ('IntersectionObserver' in window) {
+                const obs = new IntersectionObserver(entries => {
+                    skillsVisible = entries[0].isIntersecting;
+                    labels.forEach(l => {
+                        l.element.style.display = skillsVisible ? 'flex' : 'none';
+                    });
+                }, { threshold: 0.02 });
+                obs.observe(arena);
+            }
+
+            function animate() {
+                animId = requestAnimationFrame(animate);
+                if (!skillsVisible) return;
+
+                if (!isDragging) {
+                    group.rotation.y += 0.002;
+                    group.rotation.x += 0.0006;
+                }
+
+                // Project 3D node coordinates to 2D HTML overlays
+                labels.forEach(l => {
+                    l.mesh.getWorldPosition(tempV);
+                    
+                    // Don't show if it's pointing away behind the sphere
+                    if (tempV.z > 5.2) {
+                        l.element.style.opacity = 0;
+                        l.element.style.pointerEvents = 'none';
+                        return;
+                    }
+                    
+                    tempV.project(camera);
+
+                    const x = (tempV.x *  .5 + .5) * width;
+                    const y = (tempV.y * -.5 + .5) * height;
+
+                    l.element.style.left = `${x}px`;
+                    l.element.style.top = `${y}px`;
+                    
+                    const zOpacity = Math.max(0.05, (5.2 - tempV.z) / 10.4);
+                    l.element.style.opacity = zOpacity;
+                    l.element.style.pointerEvents = zOpacity > 0.45 ? 'auto' : 'none';
+                });
+
+                renderer.render(scene, camera);
+            }
+            animate();
+
+            skillsThree = { renderer, animId };
             document.getElementById('hubCount').textContent = skills.length;
         }
 
@@ -2761,6 +2941,15 @@
             const ov = document.getElementById('orbitView');
             const gv = document.getElementById('gridView');
             const lv = document.getElementById('listView');
+
+            if (currentView !== 'orbit' && skillsThree) {
+                cancelAnimationFrame(skillsThree.animId);
+                if (skillsThree.renderer) {
+                    skillsThree.renderer.dispose();
+                }
+                skillsThree = null;
+                ov.querySelectorAll('.three-label').forEach(el => el.remove());
+            }
 
             ov.style.display = 'none'; gv.classList.remove('on'); lv.classList.remove('on');
 
@@ -2975,9 +3164,101 @@
         });
 
         /* ═══════════════════════════════
+           THREE.JS HERO PARTICLES
+        ═══════════════════════════════ */
+        function initThreeHero() {
+            const canvas = document.getElementById('three-hero-canvas');
+            if (!canvas) return;
+            const container = canvas.parentElement;
+
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 100);
+            camera.position.z = 30;
+
+            const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Create particles
+            const particleCount = 200;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const initialPositions = new Float32Array(particleCount * 3);
+            
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                const u = Math.random();
+                const v = Math.random();
+                const theta = u * 2.0 * Math.PI;
+                const phi = Math.acos(2.0 * v - 1.0);
+                const r = 10 + Math.random() * 20;
+
+                positions[i] = r * Math.sin(phi) * Math.cos(theta);
+                positions[i + 1] = r * Math.sin(phi) * Math.sin(theta);
+                positions[i + 2] = r * Math.cos(phi);
+
+                initialPositions[i] = positions[i];
+                initialPositions[i + 1] = positions[i + 1];
+                initialPositions[i + 2] = positions[i + 2];
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+            const material = new THREE.PointsMaterial({
+                color: 0x06b6d4, // neon cyan
+                size: 0.18,
+                transparent: true,
+                opacity: 0.65,
+                blending: THREE.AdditiveBlending
+            });
+
+            const points = new THREE.Points(geometry, material);
+            scene.add(points);
+
+            let mouseX = 0, mouseY = 0;
+            let targetX = 0, targetY = 0;
+            
+            window.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX - window.innerWidth / 2) / 80;
+                mouseY = (e.clientY - window.innerHeight / 2) / 80;
+            });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            let heroVisible = true;
+            if ('IntersectionObserver' in window) {
+                const obs = new IntersectionObserver(entries => {
+                    heroVisible = entries[0].isIntersecting;
+                }, { threshold: 0.02 });
+                obs.observe(container);
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                if (!heroVisible) return;
+                
+                points.rotation.y += 0.0015;
+                points.rotation.x += 0.0008;
+
+                targetX += (mouseX - targetX) * 0.06;
+                targetY += (mouseY - targetY) * 0.06;
+
+                points.position.x = targetX;
+                points.position.y = -targetY;
+
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        /* ═══════════════════════════════
            PORTFOLIO LAUNCH
         ═══════════════════════════════ */
         function launchPortfolio() {
+            initThreeHero();
             $i('portfolio').classList.add('on');
             setTimeout(() => $i('nav').classList.add('on'), 150);
             setTimeout(() => { $i('hw1').style.transform = 'translateY(0)'; $i('hw1').style.transition = 'transform 1.2s cubic-bezier(0.16,1,0.3,1)'; }, 200);
